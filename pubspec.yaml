@@ -1,0 +1,54 @@
+name: vapornote
+description: VaporNote - A minimal, fluid note-taking app
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # State management
+  provider: ^6.1.1
+  
+  # Local storage
+  sqflite: ^2.3.3
+  path: ^1.9.0
+  shared_preferences: ^2.2.2
+  
+  # Image handling
+  image_picker: ^1.0.7
+  
+  # Drawing / Doodle
+  signature: ^5.4.1
+  
+  # UI
+  flutter_staggered_animations: ^1.1.1
+  animations: ^2.0.11
+  
+  # Icons
+  flutter_svg: ^2.0.10+1
+  
+  # Utils
+  uuid: ^4.4.0
+  intl: ^0.19.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  flutter_launcher_icons: ^0.13.1
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icons/app_icon.png"
+  adaptive_icon_background: "#E8F4FD"
+  adaptive_icon_foreground: "assets/icons/app_icon.png"
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icons/
