@@ -11,8 +11,8 @@ if (keystorePropertiesFile.exists()) {
 }
 
 android {
+    compileSdk 34
     namespace "com.vapornote.app"
-    compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -31,7 +31,7 @@ android {
     defaultConfig {
         applicationId "com.vapornote.app"
         minSdkVersion 21
-        targetSdkVersion flutter.targetSdkVersion
+        targetSdkVersion 34
         versionCode flutter.versionCode
         versionName flutter.versionName
     }
