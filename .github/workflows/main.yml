@@ -1,0 +1,91 @@
+name: Build & Release VaporNote APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  build:
+    name: Build Release APK (arm64)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: 'stable'
+          cache: true
+
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/vapornote.jks
+
+      - name: Create key.properties
+        run: |
+          cat > android/key.properties <<EOF
+          storePassword=${{ secrets.KEY_STORE_PASSWORD }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          storeFile=../vapornote.jks
+          EOF
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Generate launcher icons
+        run: flutter pub run flutter_launcher_icons
+
+      - name: Build release APK (arm64-v8a only)
+        run: |
+          flutter build apk --release \
+            --target-platform android-arm64 \
+            --split-per-abi \
+            --build-name="${{ github.event.inputs.tag }}" \
+            --build-number="${{ github.run_number }}"
+
+      - name: Rename APK
+        run: |
+          mv build/flutter/apk/app-arm64-v8a-release.apk \
+             VaporNote-${{ github.event.inputs.tag }}-arm64.apk
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          name: "VaporNote ${{ github.event.inputs.tag }}"
+          body: |
+            ## VaporNote ${{ github.event.inputs.tag }}
+            
+            ### 下载
+            - **VaporNote-${{ github.event.inputs.tag }}-arm64.apk** — 适用于64位Android设备
+            
+            ### 安装说明
+            1. 下载APK文件
+            2. 在手机设置中允许安装未知来源应用
+            3. 点击APK文件安装
+            
+            ### 更新内容
+            - 水生设计风格笔记应用
+            - 支持文字、清单、涂鸦、图片四合一编辑
+            - ColorOS风格圆角卡片流
+            - 本地持久化存储
+          files: |
+            VaporNote-${{ github.event.inputs.tag }}-arm64.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
